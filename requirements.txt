@@ -1,0 +1,11 @@
+docker
+pandas
+numpy
+pytest
+scikit-learn
+joblib
+torch
+requests
+fastapi
+uvicorn
+jinja2
