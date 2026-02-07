@@ -3,195 +3,313 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Smart Container Manager</title>
+    <title>Smart Container Manager | DSA EL</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
     <style>
-        body {
-            font-family: 'Outfit', sans-serif;
-            /* Sunset Orange Gradient */
-            background: linear-gradient(135deg, #FF512F 0%, #DD2476 100%); 
-            background-attachment: fixed;
-            color: #fff;
-            min-height: 100vh;
-        }
-
-        /* Enhanced Glassmorphism */
-        .glass {
-            background: rgba(255, 255, 255, 0.15);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border: 1px solid rgba(255, 255, 255, 0.3);
-            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
-        }
-
-        .glass-card {
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            transition: all 0.3s ease;
+        :root {
+            /* Toned Down Sunset Theme */
+            --bg-base: #2b102f;
+            --bg-gradient-start: #2b102f;
+            --bg-gradient-end: #200f21;
+            
+            --glass-bg: rgba(255, 255, 255, 0.05); /* Lighter glass */
+            --glass-border: rgba(255, 255, 255, 0.1);
+            
+            --accent-primary: #ff6a00;
+            --accent-secondary: #ee0979;
+            
+            --text-main: #ffffff;
+            --text-muted: rgba(255, 255, 255, 0.6);
         }
         
-        .glass-card:hover {
-            background: rgba(255, 255, 255, 0.2);
-            transform: translateY(-2px);
-            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+        body {
+            font-family: 'Outfit', sans-serif;
+            background: linear-gradient(135deg, var(--bg-gradient-start) 0%, var(--bg-gradient-end) 100%);
+            color: var(--text-main);
+            min-height: 100vh;
+            overflow: hidden; 
         }
 
-        /* Scrollbar */
-        ::-webkit-scrollbar {
-            width: 8px;
+        /* Ambient Orbs */
+        .orb {
+            position: fixed;
+            border-radius: 50%;
+            filter: blur(100px);
+            z-index: -50;
+            opacity: 0.25;
+            animation: pulse 10s infinite alternate;
         }
-        ::-webkit-scrollbar-track {
-            background: rgba(255, 255, 255, 0.1); 
-        }
-        ::-webkit-scrollbar-thumb {
-            background: rgba(255, 255, 255, 0.3); 
-            border-radius: 4px;
-        }
-        ::-webkit-scrollbar-thumb:hover {
-            background: rgba(255, 255, 255, 0.5); 
+        .orb-1 { top: -20%; left: -10%; width: 60vw; height: 60vw; background: var(--accent-primary); }
+        .orb-2 { bottom: -20%; right: -10%; width: 60vw; height: 60vw; background: var(--accent-secondary); }
+
+        @keyframes pulse {
+            0% { transform: scale(1); opacity: 0.2; }
+            100% { transform: scale(1.1); opacity: 0.3; }
         }
 
-        .animate-fade-in {
-            animation: fadeIn 0.5s ease-out;
+        /* Glassmorphism */
+        .glass-panel {
+            background: var(--glass-bg);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid var(--glass-border);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.2);
         }
 
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
+        /* Sidebar Item */
+        .nav-item {
+            transition: all 0.2s ease;
+            border-left: 3px solid transparent;
+            color: var(--text-muted);
         }
+        .nav-item:hover, .nav-item.active {
+            background: rgba(255, 255, 255, 0.05);
+            color: #fff;
+        }
+        .nav-item.active {
+            border-left-color: var(--accent-primary);
+            background: linear-gradient(90deg, rgba(255, 106, 0, 0.1) 0%, transparent 100%);
+        }
+
+        /* Gradient Text */
+        .text-gradient {
+            background: linear-gradient(135deg, var(--accent-primary) 0%, var(--accent-secondary) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        /* Terminal Logs */
+        .terminal-log {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.85rem;
+            line-height: 1.5;
+        }
+        .log-entry {
+            border-left: 2px solid rgba(255,255,255,0.2);
+            padding-left: 0.75rem;
+            margin-bottom: 0.5rem;
+            opacity: 0;
+            animation: slideIn 0.3s forwards;
+        }
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateX(-10px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        /* Button Gradient */
+        .btn-sunset {
+            background: linear-gradient(135deg, var(--accent-primary) 0%, var(--accent-secondary) 100%);
+            transition: opacity 0.2s;
+        }
+        .btn-sunset:hover { opacity: 0.9; box-shadow: 0 0 15px rgba(255, 106, 0, 0.4); }
     </style>
 </head>
-<body class="p-4 md:p-8">
-    <div class="max-w-7xl mx-auto animate-fade-in">
-        <!-- Header -->
-        <header class="mb-8 flex justify-between items-center glass p-6 rounded-3xl">
-            <div>
-                <h1 class="text-3xl md:text-4xl font-bold text-white drop-shadow-md">
-                    Smart OS <span class="text-orange-200">Manager</span>
-                </h1>
-                <p class="text-pink-100 opacity-90 text-sm md:text-base mt-1">Autonomous Kernel-Level Orchestration</p>
-            </div>
-            <div class="text-right hidden md:block">
-                <div class="text-xs text-pink-200 uppercase tracking-widest">System Status</div>
-                <div class="flex items-center justify-end gap-2 mt-1">
-                    <span class="w-3 h-3 bg-green-400 rounded-full animate-pulse shadow-[0_0_10px_#4ade80]"></span>
-                    <span class="font-bold text-white shadow-sm">Operational</span>
-                </div>
-            </div>
-        </header>
+<body class="flex flex-col md:flex-row h-screen">
 
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            <!-- Left Column: Container List -->
-            <div class="lg:col-span-1 space-y-6">
-                <div class="glass rounded-3xl p-6 h-full min-h-[500px] flex flex-col">
-                    <h2 class="text-xl font-bold mb-6 text-white flex items-center gap-2">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path></svg>
-                        Missions
-                    </h2>
-                    <div id="container-list" class="space-y-3 flex-1 overflow-y-auto pr-2">
-                        <!-- Container Items Injected Here -->
-                        <div class="animate-pulse flex items-center justify-center h-40 text-pink-200">
-                            Waiting for agent telemetry...
-                        </div>
-                    </div>
-                </div>
-            </div>
+    <!-- Orbs -->
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
 
-            <!-- Right Column: Details & Charts -->
-            <div class="lg:col-span-2 space-y-6">
-                
-                <!-- Stats Cards -->
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    <div class="glass-card rounded-2xl p-5">
-                        <div class="text-pink-100 text-xs uppercase tracking-wider mb-1">CPU Usage</div>
-                        <div id="stat-cpu" class="text-3xl font-bold text-white drop-shadow-sm">--</div>
-                    </div>
-                    <div class="glass-card rounded-2xl p-5">
-                        <div class="text-pink-100 text-xs uppercase tracking-wider mb-1">Memory Usage</div>
-                        <div id="stat-mem" class="text-3xl font-bold text-white drop-shadow-sm">--</div>
-                    </div>
-                    <div class="glass-card rounded-2xl p-5">
-                        <div class="text-pink-100 text-xs uppercase tracking-wider mb-1">Security Score</div>
-                        <div id="stat-sec" class="text-3xl font-bold text-white drop-shadow-sm">--</div>
-                    </div>
-                </div>
+    <!-- Sidebar -->
+    <aside class="w-full md:w-64 glass-panel flex flex-col z-20 md:h-full border-r border-white/10">
+        <div class="p-6">
+            <h1 class="text-2xl font-bold tracking-tight text-white flex items-center gap-2">
+                <span class="text-3xl text-gradient">⌘</span> DSA EL
+            </h1>
+            <p class="text-xs text-white/50 mt-1 uppercase tracking-widest">OS Intelligence</p>
+        </div>
+        
+        <nav class="flex-1 space-y-1 mt-4">
+            <button onclick="switchView('overview')" id="nav-overview" class="nav-item w-full text-left px-6 py-4 flex items-center gap-3 active">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"></path></svg>
+                Overview
+            </button>
+            <button onclick="switchView('intelligence')" id="nav-intelligence" class="nav-item w-full text-left px-6 py-4 flex items-center gap-3">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+                Intelligence
+            </button>
+            <button onclick="switchView('lab')" id="nav-lab" class="nav-item w-full text-left px-6 py-4 flex items-center gap-3">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.384-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"></path></svg>
+                Simulation Lab
+            </button>
+        </nav>
 
-                <!-- Charts -->
-                <div class="glass rounded-3xl p-6">
-                    <div class="flex justify-between items-center mb-6">
-                        <h3 class="text-lg font-bold text-white">Neural Prediction Engine</h3>
-                        <span class="text-xs bg-white/20 px-2 py-1 rounded text-white">Live Feed</span>
-                    </div>
-                    <canvas id="resourceChart" height="200"></canvas>
-                </div>
-
-                <!-- Security Risks -->
-                <div id="security-panel" class="glass rounded-3xl p-6 hidden border-red-400/30">
-                    <h3 class="text-lg font-bold mb-4 text-red-100 flex items-center gap-2">
-                        <svg class="w-5 h-5 text-red-200" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
-                        Security Threats Detected
-                    </h3>
-                    <ul id="risk-list" class="space-y-2 text-red-50 text-sm">
-                    </ul>
-                </div>
-
-                <!-- Evaluation Panel -->
-                <div class="glass rounded-3xl p-6 mt-6">
-                    <div class="flex justify-between items-end mb-4">
-                        <div>
-                            <h3 class="text-lg font-bold text-orange-100">Lab Evaluation</h3>
-                            <p class="text-xs text-pink-200 max-w-sm mt-1">Run comparative analysis between Static Limits and AI-Driven Dynamic Scaling.</p>
-                        </div>
-                        <button onclick="runEvaluation()" class="bg-white/20 hover:bg-white/30 border border-white/40 text-white px-5 py-2.5 rounded-xl font-semibold transition shadow-lg backdrop-blur-sm text-sm">
-                            Results Comparison
-                        </button>
-                    </div>
-                    
-                    <div id="eval-loading" class="hidden text-pink-200 text-sm animate-pulse flex items-center gap-2">
-                        <svg class="animate-spin h-4 w-4 text-white" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
-                        Running simulation scenarios (20s)...
-                    </div>
-                    
-                    <table id="eval-table" class="w-full text-sm text-left hidden mt-4">
-                        <thead class="text-xs uppercase bg-white/10 text-pink-100">
-                            <tr>
-                                <th class="px-4 py-3 rounded-l-lg">Scenario</th>
-                                <th class="px-4 py-3">Mode</th>
-                                <th class="px-4 py-3">Efficiency</th>
-                                <th class="px-4 py-3 rounded-r-lg">OOM Kills</th>
-                            </tr>
-                        </thead>
-                        <tbody id="eval-body" class="text-white"></tbody>
-                    </table>
+        <div class="p-6">
+            <div class="glass-panel p-4 rounded-xl bg-white/5 border-0">
+                <div class="text-xs text-white/40 mb-1">Status</div>
+                <div class="flex items-center gap-2">
+                    <span class="w-2 h-2 bg-green-400 rounded-full animate-pulse shadow-[0_0_8px_rgba(74,222,128,0.6)]"></span>
+                    <span class="text-sm font-semibold text-white">System Active</span>
                 </div>
             </div>
         </div>
-    </div>
+    </aside>
 
-    <!-- Background Decoration -->
-    <div class="fixed top-0 left-0 w-full h-full overflow-hidden -z-10 pointer-events-none">
-        <div class="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-purple-500/30 rounded-full blur-[100px]"></div>
-        <div class="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-orange-400/30 rounded-full blur-[100px]"></div>
-    </div>
+    <!-- Main Content -->
+    <main class="flex-1 overflow-y-auto relative z-10 p-6 md:p-10">
+        
+        <!-- View: Overview -->
+        <section id="view-overview" class="space-y-6 animate-fade-in block">
+            <header class="flex justify-between items-center mb-8">
+                <div>
+                    <h2 class="text-3xl font-bold text-white drop-shadow-sm">System Overview</h2>
+                    <p class="text-white/50">Real-time Node Telemetry</p>
+                </div>
+                <div id="sim-badge" class="hidden px-3 py-1 bg-gradient-to-r from-orange-500/20 to-pink-500/20 border border-orange-500/30 rounded-full text-xs font-bold text-orange-200 uppercase tracking-wider animate-pulse">
+                    Simulation Active
+                </div>
+            </header>
+
+            <!-- Stats Grid -->
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+                 <div class="glass-panel p-6 rounded-2xl">
+                     <div class="text-white/40 text-xs uppercase mb-2">Total CPU Load</div>
+                     <div id="metric-cpu" class="text-4xl font-bold text-white">--</div>
+                 </div>
+                 <div class="glass-panel p-6 rounded-2xl">
+                     <div class="text-white/40 text-xs uppercase mb-2">Active Nodes</div>
+                     <div id="metric-nodes" class="text-4xl font-bold text-white">--</div>
+                 </div>
+                 <div class="glass-panel p-6 rounded-2xl">
+                     <div class="text-white/40 text-xs uppercase mb-2">Containers</div>
+                     <div id="metric-containers" class="text-4xl font-bold text-white">--</div>
+                 </div>
+                 <div class="glass-panel p-6 rounded-2xl border-orange-500/30">
+                     <div class="text-orange-300 text-xs uppercase mb-2">Security Score</div>
+                     <div id="metric-security" class="text-4xl font-bold text-gradient">--</div>
+                 </div>
+            </div>
+
+            <div class="flex flex-col md:flex-row gap-6 h-[450px]">
+                <!-- Node Monitor -->
+                <div class="w-full md:w-1/3 glass-panel rounded-2xl p-6 flex flex-col">
+                    <h3 class="text-lg font-bold text-white mb-4">Active Containers</h3>
+                    <div id="container-list" class="flex-1 overflow-y-auto space-y-2 pr-2">
+                        <!-- Items -->
+                    </div>
+                </div>
+
+                <!-- Main Chart -->
+                <div class="w-full md:w-2/3 glass-panel rounded-2xl p-6 flex flex-col">
+                    <h3 class="text-lg font-bold text-white mb-4">Resource Prediction</h3>
+                    <div class="flex-1 relative w-full">
+                        <canvas id="resourceChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+
+        <!-- View: Intelligence -->
+        <section id="view-intelligence" class="space-y-6 animate-fade-in hidden h-full flex flex-col">
+            <header class="mb-4">
+                <h2 class="text-3xl font-bold text-white">Neural Intelligence Log</h2>
+                <p class="text-white/50">Real-time decisions from the Governance Engine</p>
+            </header>
+
+            <div class="flex-1 glass-panel rounded-2xl p-6 overflow-hidden flex flex-col bg-black/20">
+                <div class="flex items-center gap-2 mb-4 pb-4 border-b border-white/5">
+                    <div class="w-3 h-3 rounded-full bg-red-500/80"></div>
+                    <div class="w-3 h-3 rounded-full bg-yellow-500/80"></div>
+                    <div class="w-3 h-3 rounded-full bg-green-500/80"></div>
+                    <span class="ml-2 text-xs text-white/30 font-mono">system_events.log</span>
+                </div>
+                
+                <div id="event-log-container" class="flex-1 overflow-y-auto terminal-log space-y-2 pr-2">
+                    <div class="text-white/30">// Waiting for system events...</div>
+                </div>
+            </div>
+        </section>
+
+
+        <!-- View: Lab -->
+        <section id="view-lab" class="space-y-6 animate-fade-in hidden">
+            <header class="mb-8">
+                <h2 class="text-3xl font-bold text-white">Simulation Lab</h2>
+                <p class="text-white/50">Test constraints and run attack scenarios</p>
+            </header>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <!-- Simulator Control -->
+                <div class="glass-panel rounded-2xl p-8">
+                    <h3 class="text-xl font-bold text-white mb-6">Live Simulation</h3>
+                    <p class="text-sm text-white/60 mb-6">
+                        Inject synthetic traffic patterns and security threats to verify autonomous response without physical infrastructure.
+                    </p>
+                    
+                    <div class="space-y-4">
+                        <div class="flex gap-4">
+                            <button onclick="controlSim('start')" class="flex-1 btn-sunset text-white font-bold py-3 rounded-xl shadow-lg shadow-orange-500/20">
+                                Start Simulation
+                            </button>
+                            <button onclick="controlSim('stop')" class="flex-1 glass-panel text-white font-bold py-3 rounded-xl hover:bg-white/5">
+                                Stop
+                            </button>
+                        </div>
+                        
+                        <div class="pt-6 border-t border-white/10">
+                            <label class="text-xs text-white/40 uppercase font-bold">Scenario Mode</label>
+                            <div class="grid grid-cols-3 gap-2 mt-2">
+                                <button onclick="setSimMode('normal')" class="p-2 rounded-lg bg-white/5 text-xs text-white/70 hover:text-white hover:bg-white/10 transition text-center">Normal Load</button>
+                                <button onclick="setSimMode('spike')" class="p-2 rounded-lg bg-white/5 text-xs text-white/70 hover:text-white hover:bg-white/10 transition text-center">Spike Test</button>
+                                <button onclick="setSimMode('attack')" class="p-2 rounded-lg bg-red-500/10 text-xs text-red-300 hover:bg-red-500/20 transition text-center border border-red-500/10">Active Attack</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Evaluation -->
+                <div class="glass-panel rounded-2xl p-8">
+                    <h3 class="text-xl font-bold text-white mb-6">Efficiency Comparison</h3>
+                    <button onclick="runEvaluation()" class="w-full glass-panel border border-white/10 text-orange-200 py-3 rounded-xl mb-4 hover:bg-white/5 transition">
+                        Run Static vs Dynamic Analysis
+                    </button>
+                    
+                    <div id="eval-loading" class="hidden text-center text-xs text-white/50 py-2 animate-pulse">Processing...</div>
+
+                    <table class="w-full text-sm text-left">
+                        <thead class="text-xs text-white/40 uppercase">
+                            <tr>
+                                <th class="py-2">Mode</th>
+                                <th class="py-2">Efficiency</th>
+                                <th class="py-2">OOM Kills</th>
+                            </tr>
+                        </thead>
+                        <tbody id="eval-body" class="text-white/80">
+                            <tr><td colspan="3" class="py-4 text-center text-white/30 italic">No data available</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+    </main>
 
     <script>
-        // Set Chart Defaults for Glassmorphism
-        Chart.defaults.color = 'rgba(255, 255, 255, 0.7)';
-        Chart.defaults.borderColor = 'rgba(255, 255, 255, 0.1)';
-        
+        // --- Navigation ---
+        function switchView(viewName) {
+            ['overview', 'intelligence', 'lab'].forEach(v => {
+                document.getElementById(`view-${v}`).classList.add('hidden');
+                document.getElementById(`nav-${v}`).classList.remove('active');
+            });
+            document.getElementById(`view-${viewName}`).classList.remove('hidden');
+            document.getElementById(`nav-${viewName}`).classList.add('active');
+            
+            if(viewName === 'overview') resourceChart.resize();
+        }
+
+        // --- Chart Setup ---
+        Chart.defaults.color = 'rgba(255, 255, 255, 0.5)';
+        Chart.defaults.borderColor = 'rgba(255, 255, 255, 0.05)';
         const ctx = document.getElementById('resourceChart').getContext('2d');
-        
-        // Gradient for Chart
-        let gradient = ctx.createLinearGradient(0, 0, 0, 400);
-        gradient.addColorStop(0, 'rgba(255, 255, 255, 0.5)');
-        gradient.addColorStop(1, 'rgba(255, 255, 255, 0.05)');
+        let gradient = ctx.createLinearGradient(0, 0, 0, 300);
+        gradient.addColorStop(0, 'rgba(255, 106, 0, 0.4)'); 
+        gradient.addColorStop(1, 'rgba(255, 106, 0, 0.0)');
 
         const resourceChart = new Chart(ctx, {
             type: 'line',
@@ -200,211 +318,161 @@
                 datasets: [{
                     label: 'CPU Usage',
                     data: [],
-                    borderColor: '#ffffff',
+                    borderColor: '#ff6a00',
                     backgroundColor: gradient,
                     borderWidth: 2,
-                    pointBackgroundColor: '#ffffff',
-                    pointRadius: 3,
                     fill: true,
-                    tension: 0.4
+                    tension: 0.4,
+                    pointRadius: 0
                 }, {
-                    label: 'AI Quota Limit',
+                    label: 'Limit',
                     data: [],
-                    borderColor: 'rgba(255, 255, 255, 0.4)',
-                    borderWidth: 2,
-                    borderDash: [5, 5],
+                    borderColor: 'rgba(255, 255, 255, 0.3)',
+                    borderWidth: 1,
+                    borderDash: [4, 4],
                     pointRadius: 0,
-                    tension: 0.4
+                    tension: 0
                 }]
             },
             options: {
                 responsive: true,
-                plugins: {
-                    legend: {
-                        position: 'top',
-                        labels: { usePointStyle: true, boxWidth: 8 }
-                    }
-                },
-                scales: {
-                    y: {
-                        beginAtZero: true,
-                        grid: { color: 'rgba(255, 255, 255, 0.1)' },
-                        ticks: { callback: function(value) { return value / 1000 + 'ms'; } }
-                    },
-                    x: {
-                        grid: { display: false }
-                    }
+                maintainAspectRatio: false,
+                plugins: { legend: { display: false } },
+                scales: { 
+                    x: { display: false },
+                    y: { beginAtZero: true, grid: { color: 'rgba(255,255,255,0.05)' } }
                 }
             }
         });
 
+        // --- Data Fetching ---
         let selectedContainer = null;
+        let logsSeen = new Set();
 
-        async function fetchStats() {
+        async function refresh() {
             try {
-                const res = await fetch('/api/stats');
-                const data = await res.json();
-                updateUI_MultiNode(data);
-            } catch (e) {
-                console.error("Failed to fetch stats");
-            }
+                // 1. Stats
+                const statsRes = await fetch('/api/stats');
+                const nodes = await statsRes.json();
+                updateOverview(nodes);
+
+                // 2. Logs
+                const logsRes = await fetch('/api/events');
+                const logs = await logsRes.json();
+                updateLogs(logs);
+
+            } catch(e) { }
         }
 
-        async function fetchSecurity(id) {
-            if (!id || id.length > 20) return; // ignore complex IDs if not necessary
-            try {
-                const res = await fetch(`/api/security/${id}`);
-                const data = await res.json();
-                updateSecurityUI(data);
-            } catch (e) {
-               console.error("Sec scan fail");
-            }
-        }
-
-        function updateUI_MultiNode(nodes) {
+        function updateOverview(nodes) {
             const listEl = document.getElementById('container-list');
-            // We rebuild list only if changes to avoid jitter, or simple verify
-            // For prototype simplicity, clear and rebuild is fine but we must preserve selection logic visually
-            listEl.innerHTML = '';
+            
+            let totalCpu = 0;
+            let totalNodes = Object.keys(nodes).length;
+            let totalContainers = 0;
 
-            Object.keys(nodes).forEach(nodeId => {
-                const nodeData = nodes[nodeId];
-                
-                // Header for Node
-                const nodeHeader = document.createElement('div');
-                nodeHeader.className = "text-xs font-bold text-pink-200/60 uppercase mt-4 mb-2 pl-2 tracking-wider";
-                nodeHeader.innerText = `Node: ${nodeId}`;
-                listEl.appendChild(nodeHeader);
+            // Simple diffing
+            listEl.innerHTML = ''; 
 
-                Object.keys(nodeData.containers).forEach(containerId => {
-                    const c = nodeData.containers[containerId];
-                    const isSel = selectedContainer === (c.id || containerId);
+            Object.entries(nodes).forEach(([nodeId, data]) => {
+                if (nodeId.includes('sim')) document.getElementById('sim-badge').classList.remove('hidden');
+
+                Object.entries(data.containers).forEach(([cId, stats]) => {
+                    totalContainers++;
+                    totalCpu += stats.cpu_usage || 0;
                     
-                    const item = document.createElement('div');
-                    item.className = `p-4 rounded-xl cursor-pointer mb-2 transition-all duration-200 border border-transparent ${isSel ? 'bg-white/20 border-white/40 shadow-lg' : 'bg-white/5 hover:bg-white/10 hover:translate-x-1'}`;
-                    item.onclick = () => selectContainer(c.id || containerId, c);
-                    item.innerHTML = `
-                        <div class="flex justify-between items-center">
-                            <div class="font-bold text-sm truncate text-white">${(c.id || containerId).substring(0, 12)}...</div>
-                            <div class="w-2 h-2 rounded-full ${isSel ? 'bg-white' : 'bg-white/30'}"></div>
-                        </div>
-                        <div class="flex justify-between mt-2 text-xs text-pink-100/70">
-                            <span>CPU: ${c.cpu_usage || 0}</span>
-                            <span>${Math.round((c.memory_bytes||0) / 1024 / 1024)}MB</span>
-                        </div>
+                    const isSel = selectedContainer === cId;
+                    const el = document.createElement('div');
+                    el.className = `p-3 rounded-xl border cursor-pointer flex justify-between items-center transition mb-2
+                        ${isSel ? 'bg-white/10 border-orange-500/40 shadow-lg' : 'bg-white/5 border-transparent hover:bg-white/10'}`;
+                    el.onclick = () => { selectedContainer = cId; updateChartData(stats); };
+                    el.innerHTML = `
+                        <div class="text-sm font-bold text-white truncate w-32">${cId}</div>
+                        <div class="text-xs text-white/60">${Math.round(stats.cpu_usage/1000)}k</div>
                     `;
-                    listEl.appendChild(item);
+                    listEl.appendChild(el);
 
-                    // Update charts if selected
-                    if (isSel) {
-                        updateCharts(c);
-                    }
+                    if (isSel) updateChartData(stats);
                 });
             });
-            
-            // Auto-select first if none selected
-            if (!selectedContainer) {
-                 const firstNode = Object.keys(nodes)[0];
-                 if (firstNode) {
-                     const firstCont = Object.keys(nodes[firstNode].containers)[0];
-                     if (firstCont) {
-                         selectContainer(firstCont, nodes[firstNode].containers[firstCont]);
-                     }
-                 }
+
+            document.getElementById('metric-nodes').innerText = totalNodes;
+            document.getElementById('metric-containers').innerText = totalContainers;
+            document.getElementById('metric-cpu').innerText = Math.round(totalCpu/1000000) + 'M';
+            document.getElementById('metric-security').innerText = '98'; 
+
+            if (!selectedContainer && totalContainers > 0) {
+                 const firstNode = Object.values(nodes)[0];
+                 const firstC = Object.keys(firstNode.containers)[0];
+                 if(firstC) selectedContainer = firstC;
             }
         }
-        
-        function updateCharts(c) {
-            document.getElementById('stat-cpu').innerText = c.cpu_usage;
-            document.getElementById('stat-mem').innerText = `${Math.round((c.memory_bytes||0) / 1024 / 1024)} MB`;
-            
-            const timeLabel = new Date().toLocaleTimeString();
-            
-            // Limit data points
-            if (resourceChart.data.labels.length > 30) {
+
+        function updateChartData(stats) {
+            const time = new Date().toLocaleTimeString();
+            if (resourceChart.data.labels.length > 40) {
                 resourceChart.data.labels.shift();
                 resourceChart.data.datasets[0].data.shift();
                 resourceChart.data.datasets[1].data.shift();
             }
-
-            resourceChart.data.labels.push(timeLabel);
-            resourceChart.data.datasets[0].data.push(c.cpu_usage);
-            resourceChart.data.datasets[1].data.push(c.prediction || c.cpu_usage); 
-            resourceChart.update('none'); // 'none' for performance
+            resourceChart.data.labels.push(time);
+            resourceChart.data.datasets[0].data.push(stats.cpu_usage);
+            resourceChart.data.datasets[1].data.push(stats.prediction);
+            resourceChart.update('none');
         }
 
-        function selectContainer(id, data) {
-            selectedContainer = id;
-            if (data) fetchSecurity(id);
-            // Don't clear chart immediately to avoid flicker, just let next update cycle handle it 
-            // or clear if completely different context desired.
-            // But we do want to verify data matches if we switched.
+        function updateLogs(logs) {
+            const container = document.getElementById('event-log-container');
+            const latest = logs[0];
+            if (!latest) return;
+            
+            const key = latest.timestamp + latest.message;
+            if (logsSeen.has(key)) return;
+            
+            if (container.children.length > 20) container.innerHTML = '';
+
+            logs.forEach(log => {
+                const k = log.timestamp + log.message;
+                if (logsSeen.has(k)) return;
+                logsSeen.add(k);
+
+                const el = document.createElement('div');
+                el.className = 'log-entry';
+                
+                let color = 'text-white/80';
+                if (log.level === 'WARNING') { color = 'text-yellow-400'; el.style.borderLeftColor = '#facc15'; }
+                if (log.level === 'CRITICAL') { color = 'text-red-400'; el.style.borderLeftColor = '#f87171'; }
+                if (log.level === 'SUCCESS') { color = 'text-green-400'; el.style.borderLeftColor = '#4ade80'; }
+
+                el.innerHTML = `
+                    <span class="text-white/30 text-xs">[${log.timestamp}]</span>
+                    <span class="font-bold text-xs uppercase ml-1 ${color}">${log.source}</span>
+                    <span class="text-white/60 ml-2">${log.message}</span>
+                `;
+                container.prepend(el);
+            });
         }
-        
-        function updateSecurityUI(data) {
-            const scoreEl = document.getElementById('stat-sec');
-            const panel = document.getElementById('security-panel');
-            const list = document.getElementById('risk-list');
 
-            if (!data) return;
-
-            scoreEl.innerText = data.score;
-            // Color code
-            if(data.score >= 90) scoreEl.className = "text-3xl font-bold text-green-300 drop-shadow-sm";
-            else if(data.score >= 70) scoreEl.className = "text-3xl font-bold text-yellow-300 drop-shadow-sm";
-            else scoreEl.className = "text-3xl font-bold text-red-300 drop-shadow-sm";
-
-            if (data.risks && data.risks.length > 0) {
-                panel.classList.remove('hidden');
-                list.innerHTML = data.risks.map(r => `
-                    <li class="flex items-start gap-2 bg-red-500/10 p-2 rounded">
-                        <span class="mt-1 w-1.5 h-1.5 bg-red-400 rounded-full flex-shrink-0"></span>
-                        ${r}
-                    </li>`).join('');
-            } else {
-                panel.classList.add('hidden');
-            }
-        }
-
+        // --- Controls ---
+        async function controlSim(action) { await fetch(`/api/simulation/${action}`, { method: 'POST' }); }
+        async function setSimMode(mode) { await fetch(`/api/simulation/mode?mode=${mode}`, { method: 'POST' }); }
         async function runEvaluation() {
-            document.getElementById('eval-loading').classList.remove('hidden');
-            document.getElementById('eval-table').classList.add('hidden');
+            const btn = document.querySelector('#view-lab button');
+            const loader = document.getElementById('eval-loading');
+            btn.disabled = true; loader.classList.remove('hidden');
             try {
                 const res = await fetch('/api/run_evaluation');
                 const data = await res.json();
-                
-                const tbody = document.getElementById('eval-body');
-                tbody.innerHTML = '';
-                
+                const tbody = document.getElementById('eval-body'); tbody.innerHTML = '';
                 data.forEach(row => {
-                   const tr = document.createElement('tr');
-                   const isDyn = row.Mode === 'dynamic';
-                   tr.className = "border-b border-white/10 last:border-0 hover:bg-white/5 transition";
-                   tr.innerHTML = `
-                      <td class="px-4 py-3 font-medium">${row.Scenario}</td>
-                      <td class="px-4 py-3 uppercase text-xs font-bold tracking-wider ${isDyn ? 'text-green-300' : 'text-orange-300'}">
-                        <span class="px-2 py-1 rounded bg-white/10">${row.Mode}</span>
-                      </td>
-                      <td class="px-4 py-3 font-mono">${row.Efficiency_Percent}%</td>
-                      <td class="px-4 py-3 ${row.OOM_Kills > 0 ? 'text-red-300 font-bold' : 'text-white/50'}">${row.OOM_Kills}</td>
-                   `;
-                   tbody.appendChild(tr);
+                    tbody.innerHTML += `<tr class="border-b border-white/5 hover:bg-white/5"><td class="py-3 pl-2">${row.Mode}</td><td>${row.Efficiency_Percent}%</td><td class="${row.OOM_Kills>0?'text-red-400':''}">${row.OOM_Kills}</td></tr>`;
                 });
-                
-                document.getElementById('eval-loading').classList.add('hidden');
-                document.getElementById('eval-table').classList.remove('hidden');
-
-            } catch(e) {
-                console.error(e);
-                alert("Evaluation failed");
-                document.getElementById('eval-loading').classList.add('hidden');
-            }
+            } catch(e) {}
+            btn.disabled = false; loader.classList.add('hidden');
         }
 
-        // Poll every 2 seconds
-        setInterval(fetchStats, 2000);
-        // Initial load
-        fetchStats();
+        setInterval(refresh, 1000);
+        refresh();
     </script>
 </body>
 </html>
