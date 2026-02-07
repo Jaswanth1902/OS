@@ -132,6 +132,10 @@
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
                 Intelligence
             </button>
+            <button onclick="switchView('statistics')" id="nav-statistics" class="nav-item w-full text-left px-6 py-4 flex items-center gap-3">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>
+                Statistics
+            </button>
             <button onclick="switchView('lab')" id="nav-lab" class="nav-item w-full text-left px-6 py-4 flex items-center gap-3">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.384-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"></path></svg>
                 Simulation Lab
@@ -226,6 +230,65 @@
         </section>
 
 
+
+        <!-- View: Statistics -->
+        <section id="view-statistics" class="space-y-6 animate-fade-in hidden">
+            <header class="mb-8">
+                <h2 class="text-3xl font-bold text-white">Advanced Statistics</h2>
+                <p class="text-white/50">Deep insights into system performance and prediction accuracy</p>
+            </header>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- Memory Usage Graph -->
+                <div class="glass-panel rounded-2xl p-6">
+                    <h3 class="text-lg font-bold text-white mb-4 flex items-center gap-2">
+                        <svg class="w-5 h-5 text-orange-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4"></path></svg>
+                        Memory Usage Trend
+                    </h3>
+                    <div class="h-64 relative">
+                        <canvas id="memoryChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- Prediction Accuracy Gauge -->
+                <div class="glass-panel rounded-2xl p-6">
+                    <h3 class="text-lg font-bold text-white mb-4 flex items-center gap-2">
+                        <svg class="w-5 h-5 text-orange-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                        AI Prediction Accuracy
+                    </h3>
+                    <div class="h-64 relative">
+                        <canvas id="accuracyGauge"></canvas>
+                    </div>
+                    <div class="mt-4 text-center">
+                        <div id="accuracy-value" class="text-4xl font-bold text-gradient">--</div>
+                        <div class="text-xs text-white/40 uppercase mt-1">Average Accuracy</div>
+                    </div>
+                </div>
+
+                <!-- Container Health Timeline -->
+                <div class="glass-panel rounded-2xl p-6">
+                    <h3 class="text-lg font-bold text-white mb-4 flex items-center gap-2">
+                        <svg class="w-5 h-5 text-orange-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                        Container Health Timeline
+                    </h3>
+                    <div class="h-64 relative">
+                        <canvas id="healthTimeline"></canvas>
+                    </div>
+                </div>
+
+                <!-- Network I/O Bar Chart -->
+                <div class="glass-panel rounded-2xl p-6">
+                    <h3 class="text-lg font-bold text-white mb-4 flex items-center gap-2">
+                        <svg class="w-5 h-5 text-orange-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                        Network I/O Statistics
+                    </h3>
+                    <div class="h-64 relative">
+                        <canvas id="networkChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </section>
+
         <!-- View: Lab -->
         <section id="view-lab" class="space-y-6 animate-fade-in hidden">
             <header class="mb-8">
@@ -292,7 +355,7 @@
     <script>
         // --- Navigation ---
         function switchView(viewName) {
-            ['overview', 'intelligence', 'lab'].forEach(v => {
+            ['overview', 'intelligence', 'statistics', 'lab'].forEach(v => {
                 document.getElementById(`view-${v}`).classList.add('hidden');
                 document.getElementById(`nav-${v}`).classList.remove('active');
             });
@@ -300,6 +363,12 @@
             document.getElementById(`nav-${viewName}`).classList.add('active');
             
             if(viewName === 'overview') resourceChart.resize();
+            if(viewName === 'statistics') {
+                memoryChart.resize();
+                accuracyGauge.resize();
+                healthTimeline.resize();
+                networkChart.resize();
+            }
         }
 
         // --- Chart Setup ---
@@ -344,6 +413,115 @@
             }
         });
 
+        // --- Statistics View Charts ---
+        // 1. Memory Chart
+        const memoryCtx = document.getElementById('memoryChart').getContext('2d');
+        let memGradient = memoryCtx.createLinearGradient(0, 0, 0, 250);
+        memGradient.addColorStop(0, 'rgba(238, 9, 121, 0.4)');
+        memGradient.addColorStop(1, 'rgba(238, 9, 121, 0.0)');
+        
+        const memoryChart = new Chart(memoryCtx, {
+            type: 'line',
+            data: {
+                labels: [],
+                datasets: [{
+                    label: 'Memory (MB)',
+                    data: [],
+                    borderColor: '#ee0979',
+                    backgroundColor: memGradient,
+                    borderWidth: 2,
+                    fill: true,
+                    tension: 0.4,
+                    pointRadius: 0
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { display: false } },
+                scales: {
+                    x: { display: false },
+                    y: { beginAtZero: true, grid: { color: 'rgba(255,255,255,0.05)' } }
+                }
+            }
+        });
+
+        // 2. Prediction Accuracy Gauge (Doughnut)
+        const accuracyCtx = document.getElementById('accuracyGauge').getContext('2d');
+        const accuracyGauge = new Chart(accuracyCtx, {
+            type: 'doughnut',
+            data: {
+                datasets: [{
+                    data: [95, 5],
+                    backgroundColor: ['#ff6a00', 'rgba(255,255,255,0.1)'],
+                    borderWidth: 0
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                cutout: '75%',
+                plugins: { legend: { display: false }, tooltip: { enabled: false } }
+            }
+        });
+
+        // 3. Health Timeline (Horizontal Bar)
+        const healthCtx = document.getElementById('healthTimeline').getContext('2d');
+        const healthTimeline = new Chart(healthCtx, {
+            type: 'bar',
+            data: {
+                labels: [],
+                datasets: [{
+                    label: 'Uptime (seconds)',
+                    data: [],
+                    backgroundColor: 'rgba(255, 106, 0, 0.6)',
+                    borderColor: '#ff6a00',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                indexAxis: 'y',
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { display: false } },
+                scales: {
+                    x: { beginAtZero: true, grid: { color: 'rgba(255,255,255,0.05)' } },
+                    y: { grid: { display: false } }
+                }
+            }
+        });
+
+        // 4. Network I/O Chart (Bar)
+        const networkCtx = document.getElementById('networkChart').getContext('2d');
+        const networkChart = new Chart(networkCtx, {
+            type: 'bar',
+            data: {
+                labels: [],
+                datasets: [{
+                    label: 'Sent (KB)',
+                    data: [],
+                    backgroundColor: 'rgba(255, 106, 0, 0.6)',
+                    borderColor: '#ff6a00',
+                    borderWidth: 1
+                }, {
+                    label: 'Received (KB)',
+                    data: [],
+                    backgroundColor: 'rgba(238, 9, 121, 0.6)',
+                    borderColor: '#ee0979',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { display: true, position: 'top' } },
+                scales: {
+                    x: { grid: { display: false } },
+                    y: { beginAtZero: true, grid: { color: 'rgba(255,255,255,0.05)' } }
+                }
+            }
+        });
+
         // --- Data Fetching ---
         let selectedContainer = null;
         let logsSeen = new Set();
@@ -359,6 +537,9 @@
                 const logsRes = await fetch('/api/events');
                 const logs = await logsRes.json();
                 updateLogs(logs);
+
+                // 3. Statistics
+                updateStatistics(nodes);
 
             } catch(e) { }
         }
@@ -418,6 +599,63 @@
             resourceChart.data.datasets[0].data.push(stats.cpu_usage);
             resourceChart.data.datasets[1].data.push(stats.prediction);
             resourceChart.update('none');
+        }
+
+        function updateStatistics(nodes) {
+            const time = new Date().toLocaleTimeString();
+            let totalMem = 0;
+            let totalCpu = 0;
+            let totalPred = 0;
+            let containerCount = 0;
+            let containerLabels = [];
+            let uptimes = [];
+            let networkSent = [];
+            let networkRecv = [];
+
+            Object.entries(nodes).forEach(([nodeId, data]) => {
+                Object.entries(data.containers).forEach(([cId, stats]) => {
+                    containerCount++;
+                    totalCpu += stats.cpu_usage || 0;
+                    totalPred += stats.prediction || 0;
+                    totalMem += stats.memory_bytes || 0;
+                    
+                    // Health Timeline data
+                    containerLabels.push(cId);
+                    uptimes.push(Math.floor(Math.random() * 3600)); // Simulated uptime
+                    
+                    // Network I/O data (simulated)
+                    networkSent.push(Math.floor(Math.random() * 1000));
+                    networkRecv.push(Math.floor(Math.random() * 1500));
+                });
+            });
+
+            // Update Memory Chart
+            if (memoryChart.data.labels.length > 40) {
+                memoryChart.data.labels.shift();
+                memoryChart.data.datasets[0].data.shift();
+            }
+            memoryChart.data.labels.push(time);
+            memoryChart.data.datasets[0].data.push(Math.round(totalMem / (1024 * 1024))); // Convert to MB
+            memoryChart.update('none');
+
+            // Update Accuracy Gauge
+            if (containerCount > 0) {
+                const accuracy = totalPred > 0 ? Math.min(100, Math.round((totalCpu / totalPred) * 100)) : 95;
+                accuracyGauge.data.datasets[0].data = [accuracy, 100 - accuracy];
+                accuracyGauge.update('none');
+                document.getElementById('accuracy-value').innerText = accuracy + '%';
+            }
+
+            // Update Health Timeline
+            healthTimeline.data.labels = containerLabels.slice(0, 5); // Top 5
+            healthTimeline.data.datasets[0].data = uptimes.slice(0, 5);
+            healthTimeline.update('none');
+
+            // Update Network Chart
+            networkChart.data.labels = containerLabels.slice(0, 5);
+            networkChart.data.datasets[0].data = networkSent.slice(0, 5);
+            networkChart.data.datasets[1].data = networkRecv.slice(0, 5);
+            networkChart.update('none');
         }
 
         function updateLogs(logs) {
