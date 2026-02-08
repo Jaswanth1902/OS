@@ -29,21 +29,51 @@ def report_stats(container_id, cpu, mem, prediction, node_id="local"):
         pass
 
 def find_cgroup_path_for_container(container_id: str):
-    """Heuristic mapping from a container id to a likely cgroup path under /sys/fs/cgroup.
-
-    This tries a few common layouts and returns the first path that exists. It is conservative
-    and intended for prototyping — for production use integrate with the container runtime.
     """
+    Resolves a container name/ID to its cgroup path.
+    1. Tries 'docker inspect' to get the Full ID and Cgroup Parent.
+    2. Fallback to standard heuristics.
+    """
+    # 1. Try Docker Inspect
+    try:
+        import subprocess
+        # Get Full ID
+        cmd = ["docker", "inspect", "--format", "{{.Id}}", container_id]
+        full_id = subprocess.check_output(cmd, stderr=subprocess.DEVNULL).decode().strip()
+        
+        # Heuristic for Docker cgroup locations using Full ID
+        candidates = [
+             os.path.join('docker', full_id),
+             f"system.slice/docker-{full_id}.scope",
+             f"docker-{full_id}.scope",
+             # Sometimes it's just the ID
+             full_id
+        ]
+        
+        # Check if they exist
+        for c in candidates:
+            if os.path.exists(os.path.join('/sys/fs/cgroup', c)):
+                return c
+            # Try CPU controller specifically if root is unified
+            if os.path.exists(os.path.join('/sys/fs/cgroup/cpu', c)):
+                return c
+
+    except Exception:
+        pass # Docker might not be available or container not found
+
+    # 2. Fallback Heuristics (for Name or partial ID)
     candidates = [
         os.path.join('docker', container_id),
         container_id,
         f"system.slice/docker-{container_id}.scope",
-        f"system.slice/containerd-{container_id}.scope",
     ]
     for c in candidates:
         full = os.path.join('/sys/fs/cgroup', c)
         if os.path.exists(full):
             return c
+        if os.path.exists(os.path.join('/sys/fs/cgroup/cpu', c)):
+            return c
+            
     return None
 
 

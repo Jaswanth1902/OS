@@ -10,10 +10,13 @@ Demonstrate a "Zero-Touch" Intelligent Operating System that manages container r
 4.  Port `8000` is free.
 
 ## Phase 1: Setup (Before Audience Arrives)
-1.  Open Terminal in `c:\Users\jaswa\Downloads\OS`.
+1.  Open Terminal in `c:\Users\jaswa\Downloads\OS` (or Linux path).
 2.  Start the Dashboard:
     ```bash
+    # Windows
     uvicorn src.dashboard_app:app --port 8000
+    # Linux
+    python3 -m uvicorn src.dashboard_app:app --port 8000
     ```
 3.  Open Browser to `http://localhost:8000`.
 
@@ -32,7 +35,12 @@ Demonstrate a "Zero-Touch" Intelligent Operating System that manages container r
 1.  Open a new Terminal.
 2.  Run the workload script:
     ```cmd
+    # Windows
     run_ml_workload.bat
+    
+    # Linux
+    chmod +x run_ml_workload.sh
+    ./run_ml_workload.sh
     ```
     *   *Explain:* "This builds a Docker container and launches our Agent."
     *   A new window will pop up (The Agent).
@@ -50,5 +58,12 @@ Demonstrate a "Zero-Touch" Intelligent Operating System that manages container r
 4.  **100s+ (Completion)**: Usage drops.
 
 ## Phase 5: Cleanup
-1.  Run `stop_ml_workload.bat` to kill the container.
+1.  Run cleanup script:
+    ```cmd
+    # Windows
+    stop_ml_workload.bat
+    
+    # Linux
+    ./stop_ml_workload.sh
+    ```
 2.  Click **"Stop"** in Simulation Lab.
