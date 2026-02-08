@@ -80,6 +80,7 @@
         .text-gradient {
             background: linear-gradient(135deg, var(--accent-primary) 0%, var(--accent-secondary) 100%);
             -webkit-background-clip: text;
+            background-clip: text;
             -webkit-text-fill-color: transparent;
         }
 
@@ -238,54 +239,9 @@
                 <p class="text-white/50">Deep insights into system performance and prediction accuracy</p>
             </header>
 
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <!-- Memory Usage Graph -->
-                <div class="glass-panel rounded-2xl p-6">
-                    <h3 class="text-lg font-bold text-white mb-4 flex items-center gap-2">
-                        <svg class="w-5 h-5 text-orange-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4"></path></svg>
-                        Memory Usage Trend
-                    </h3>
-                    <div class="h-64 relative">
-                        <canvas id="memoryChart"></canvas>
-                    </div>
-                </div>
-
-                <!-- Prediction Accuracy Gauge -->
-                <div class="glass-panel rounded-2xl p-6">
-                    <h3 class="text-lg font-bold text-white mb-4 flex items-center gap-2">
-                        <svg class="w-5 h-5 text-orange-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                        AI Prediction Accuracy
-                    </h3>
-                    <div class="h-64 relative">
-                        <canvas id="accuracyGauge"></canvas>
-                    </div>
-                    <div class="mt-4 text-center">
-                        <div id="accuracy-value" class="text-4xl font-bold text-gradient">--</div>
-                        <div class="text-xs text-white/40 uppercase mt-1">Average Accuracy</div>
-                    </div>
-                </div>
-
-                <!-- Container Health Timeline -->
-                <div class="glass-panel rounded-2xl p-6">
-                    <h3 class="text-lg font-bold text-white mb-4 flex items-center gap-2">
-                        <svg class="w-5 h-5 text-orange-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                        Container Health Timeline
-                    </h3>
-                    <div class="h-64 relative">
-                        <canvas id="healthTimeline"></canvas>
-                    </div>
-                </div>
-
-                <!-- Network I/O Bar Chart -->
-                <div class="glass-panel rounded-2xl p-6">
-                    <h3 class="text-lg font-bold text-white mb-4 flex items-center gap-2">
-                        <svg class="w-5 h-5 text-orange-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                        Network I/O Statistics
-                    </h3>
-                    <div class="h-64 relative">
-                        <canvas id="networkChart"></canvas>
-                    </div>
-                </div>
+            <!-- Dynamic Container List -->
+            <div id="stats-container-list" class="space-y-6">
+                <!-- Charts will be injected here by JS -->
             </div>
         </section>
 
@@ -413,114 +369,8 @@
             }
         });
 
-        // --- Statistics View Charts ---
-        // 1. Memory Chart
-        const memoryCtx = document.getElementById('memoryChart').getContext('2d');
-        let memGradient = memoryCtx.createLinearGradient(0, 0, 0, 250);
-        memGradient.addColorStop(0, 'rgba(238, 9, 121, 0.4)');
-        memGradient.addColorStop(1, 'rgba(238, 9, 121, 0.0)');
-        
-        const memoryChart = new Chart(memoryCtx, {
-            type: 'line',
-            data: {
-                labels: [],
-                datasets: [{
-                    label: 'Memory (MB)',
-                    data: [],
-                    borderColor: '#ee0979',
-                    backgroundColor: memGradient,
-                    borderWidth: 2,
-                    fill: true,
-                    tension: 0.4,
-                    pointRadius: 0
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: { legend: { display: false } },
-                scales: {
-                    x: { display: false },
-                    y: { beginAtZero: true, grid: { color: 'rgba(255,255,255,0.05)' } }
-                }
-            }
-        });
-
-        // 2. Prediction Accuracy Gauge (Doughnut)
-        const accuracyCtx = document.getElementById('accuracyGauge').getContext('2d');
-        const accuracyGauge = new Chart(accuracyCtx, {
-            type: 'doughnut',
-            data: {
-                datasets: [{
-                    data: [95, 5],
-                    backgroundColor: ['#ff6a00', 'rgba(255,255,255,0.1)'],
-                    borderWidth: 0
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                cutout: '75%',
-                plugins: { legend: { display: false }, tooltip: { enabled: false } }
-            }
-        });
-
-        // 3. Health Timeline (Horizontal Bar)
-        const healthCtx = document.getElementById('healthTimeline').getContext('2d');
-        const healthTimeline = new Chart(healthCtx, {
-            type: 'bar',
-            data: {
-                labels: [],
-                datasets: [{
-                    label: 'Uptime (seconds)',
-                    data: [],
-                    backgroundColor: 'rgba(255, 106, 0, 0.6)',
-                    borderColor: '#ff6a00',
-                    borderWidth: 1
-                }]
-            },
-            options: {
-                indexAxis: 'y',
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: { legend: { display: false } },
-                scales: {
-                    x: { beginAtZero: true, grid: { color: 'rgba(255,255,255,0.05)' } },
-                    y: { grid: { display: false } }
-                }
-            }
-        });
-
-        // 4. Network I/O Chart (Bar)
-        const networkCtx = document.getElementById('networkChart').getContext('2d');
-        const networkChart = new Chart(networkCtx, {
-            type: 'bar',
-            data: {
-                labels: [],
-                datasets: [{
-                    label: 'Sent (KB)',
-                    data: [],
-                    backgroundColor: 'rgba(255, 106, 0, 0.6)',
-                    borderColor: '#ff6a00',
-                    borderWidth: 1
-                }, {
-                    label: 'Received (KB)',
-                    data: [],
-                    backgroundColor: 'rgba(238, 9, 121, 0.6)',
-                    borderColor: '#ee0979',
-                    borderWidth: 1
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: { legend: { display: true, position: 'top' } },
-                scales: {
-                    x: { grid: { display: false } },
-                    y: { beginAtZero: true, grid: { color: 'rgba(255,255,255,0.05)' } }
-                }
-            }
-        });
+        // --- Statistics View Charts (Dynamic) ---
+        const containerCharts = {}; // { cId: { mem: Chart, net: Chart } }
 
         // --- Data Fetching ---
         let selectedContainer = null;
@@ -538,7 +388,7 @@
                 const logs = await logsRes.json();
                 updateLogs(logs);
 
-                // 3. Statistics
+                // 3. Statistics (Dynamic List)
                 updateStatistics(nodes);
 
             } catch(e) { }
@@ -550,9 +400,7 @@
             let totalCpu = 0;
             let totalNodes = Object.keys(nodes).length;
             let totalContainers = 0;
-
-            // Simple diffing
-            listEl.innerHTML = ''; 
+            let listHtml = '';
 
             Object.entries(nodes).forEach(([nodeId, data]) => {
                 if (nodeId.includes('sim')) document.getElementById('sim-badge').classList.remove('hidden');
@@ -561,171 +409,161 @@
                     totalContainers++;
                     totalCpu += stats.cpu_usage || 0;
                     
-                    const isSel = selectedContainer === cId;
-                    const el = document.createElement('div');
-                    el.className = `p-3 rounded-xl border cursor-pointer flex justify-between items-center transition mb-2
-                        ${isSel ? 'bg-white/10 border-orange-500/40 shadow-lg' : 'bg-white/5 border-transparent hover:bg-white/10'}`;
-                    el.onclick = () => { selectedContainer = cId; updateChartData(stats); };
-                    el.innerHTML = `
-                        <div class="text-sm font-bold text-white truncate w-32">${cId}</div>
-                        <div class="text-xs text-white/60">${Math.round(stats.cpu_usage/1000)}k</div>
+                    // Simple List Item
+                    listHtml += `
+                        <div class="p-3 rounded-xl border border-transparent bg-white/5 flex justify-between items-center mb-2">
+                            <div class="text-sm font-bold text-white truncate w-32">${cId}</div>
+                            <div class="text-xs text-white/60">${Math.round((stats.cpu_usage||0)/1000)}k</div>
+                        </div>
                     `;
-                    listEl.appendChild(el);
 
-                    if (isSel) updateChartData(stats);
+                    // Update Main Overview Chart (Aggregate or First)
+                    // For now, let's just show Aggregate CPU on the main chart? 
+                    // Or keep the old behavior of "Overview = Aggregate"? 
+                    // The main chart is "Resource Prediction", usually total.
+                    // Let's just push the first container's data to keep it alive or aggregate?
+                    // Let's aggregate for the overview chart.
                 });
             });
+            
+            listEl.innerHTML = listHtml;
 
             document.getElementById('metric-nodes').innerText = totalNodes;
             document.getElementById('metric-containers').innerText = totalContainers;
             document.getElementById('metric-cpu').innerText = Math.round(totalCpu/1000000) + 'M';
             document.getElementById('metric-security').innerText = '98'; 
 
-            if (!selectedContainer && totalContainers > 0) {
-                 const firstNode = Object.values(nodes)[0];
-                 const firstC = Object.keys(firstNode.containers)[0];
-                 if(firstC) selectedContainer = firstC;
-            }
-        }
-
-        function updateChartData(stats) {
+             // Update Main Resource Chart (Aggregate CPU)
             const time = new Date().toLocaleTimeString();
             if (resourceChart.data.labels.length > 40) {
                 resourceChart.data.labels.shift();
                 resourceChart.data.datasets[0].data.shift();
-                resourceChart.data.datasets[1].data.shift();
             }
             resourceChart.data.labels.push(time);
-            resourceChart.data.datasets[0].data.push(stats.cpu_usage);
-            resourceChart.data.datasets[1].data.push(stats.prediction);
+            resourceChart.data.datasets[0].data.push(totalCpu);
             resourceChart.update('none');
         }
 
         function updateStatistics(nodes) {
+            const listEl = document.getElementById('stats-container-list');
+            const currentIds = new Set();
             const time = new Date().toLocaleTimeString();
-            let totalMem = 0;
-            let totalCpu = 0;
-            let totalPred = 0;
-            let containerCount = 0;
-            let containerLabels = [];
-            let uptimes = [];
-            let networkSent = [];
-            let networkRecv = [];
 
-            // Check if os-ml-project JUST appeared to auto-select it once
-            let mlPresent = false;
-            Object.values(nodes).forEach(n => {
-                if (n.containers['os-ml-project']) mlPresent = true;
-            });
-
-            if (mlPresent && selectedContainer !== 'os-ml-project' && !window.hasAutoSelectedML) {
-                selectedContainer = 'os-ml-project';
-                window.hasAutoSelectedML = true;
-            }
-
-            // Iterate ALL nodes to build the list and aggregate stats
-            let listHtml = '';
-            
             Object.entries(nodes).forEach(([nodeId, data]) => {
-                if (nodeId.includes('sim')) document.getElementById('sim-badge').classList.remove('hidden');
-
                 Object.entries(data.containers).forEach(([cId, stats]) => {
-                    containerCount++;
-                    totalCpu += stats.cpu_usage || 0;
-                    totalPred += stats.prediction || 0;
-                    totalMem += stats.memory_bytes || 0;
+                    currentIds.add(cId);
                     
-                    // Specific Logic for ML Project Network Sim (since agent doesn't report it)
-                    if (cId === 'os-ml-project') {
-                        // High network during "Loading" phase (approx memory growth)
-                        if (stats.memory_bytes > 500 * 1024 * 1024 && stats.memory_bytes < 1.8 * 1024 * 1024 * 1024) {
-                            stats.network_rx = 85000;
+                    // 1. Create Card if missing
+                    if (!document.getElementById(`card-${cId}`)) {
+                        const card = document.createElement('div');
+                        card.id = `card-${cId}`;
+                        card.className = "glass-panel rounded-2xl p-6 relative overflow-hidden animate-fade-in";
+                        
+                        // Layout: Header + 2 Columns (Mem, Net)
+                        card.innerHTML = `
+                            <div class="flex justify-between items-center mb-4 border-b border-white/10 pb-2">
+                                <div class="flex items-center gap-3">
+                                    <div class="w-3 h-3 rounded-full bg-green-400 shadow-[0_0_8px_rgba(74,222,128,0.6)]"></div>
+                                    <h3 class="text-xl font-bold text-white">${cId}</h3>
+                                </div>
+                                <div class="text-xs text-white/40 uppercase font-mono tracking-wider">${nodeId}</div>
+                            </div>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div>
+                                    <div class="text-xs text-white/40 uppercase mb-2">Memory Usage</div>
+                                    <div class="h-40 relative"><canvas id="chart-mem-${cId}"></canvas></div>
+                                </div>
+                                <div>
+                                    <div class="text-xs text-white/40 uppercase mb-2">Network I/O</div>
+                                    <div class="h-40 relative"><canvas id="chart-net-${cId}"></canvas></div>
+                                </div>
+                            </div>
+                        `;
+                        
+                        // Insert at top if ML project
+                        if (cId === 'os-ml-project') {
+                             listEl.prepend(card);
                         } else {
-                            stats.network_rx = 1200;
+                             listEl.appendChild(card);
                         }
-                        stats.network_tx = 500;
+
+                        // Init Charts
+                        const ctxMem = document.getElementById(`chart-mem-${cId}`).getContext('2d');
+                        const ctxNet = document.getElementById(`chart-net-${cId}`).getContext('2d');
+
+                        // Mem Chart
+                        let memGradient = ctxMem.createLinearGradient(0, 0, 0, 200);
+                        memGradient.addColorStop(0, 'rgba(255, 106, 0, 0.4)');
+                        memGradient.addColorStop(1, 'rgba(255, 106, 0, 0.0)');
+
+                        const chartMem = new Chart(ctxMem, {
+                            type: 'line',
+                            data: { labels: [], datasets: [{ data: [], borderColor: '#ff6a00', backgroundColor: memGradient, fill: true, pointRadius: 0, tension: 0.4 }] },
+                            options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { display: false }, y: { beginAtZero: true, grid: { color: 'rgba(255,255,255,0.05)' } } } }
+                        });
+
+                        // Net Chart
+                        const chartNet = new Chart(ctxNet, {
+                            type: 'bar',
+                            data: { labels: [], datasets: [
+                                { label: 'Tx', data: [], backgroundColor: '#ff6a00' },
+                                { label: 'Rx', data: [], backgroundColor: '#ee0979' }
+                            ]},
+                            options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { display: false }, y: { beginAtZero: true, grid: { color: 'rgba(255,255,255,0.05)' } } } }
+                        });
+
+                        containerCharts[cId] = { mem: chartMem, net: chartNet };
+                    }
+
+                    // 2. Prepare Data
+                    // Network Sim Logic
+                    let netTx = 0, netRx = 0;
+                    if (cId === 'os-ml-project') {
+                        if (stats.memory_bytes > 500 * 1024 * 1024 && stats.memory_bytes < 1.8 * 1024 * 1024 * 1024) netRx = 85000;
+                        else netRx = 1200;
+                        netTx = 500;
                     } else {
-                        // Sim for others
-                        stats.network_rx = Math.floor(Math.random() * 1500);
-                        stats.network_tx = Math.floor(Math.random() * 1000);
+                        netRx = Math.floor(Math.random() * 1500);
+                        netTx = Math.floor(Math.random() * 1000);
                     }
 
-                    // Network Data for Aggregation/Charts
-                    networkSent.push(stats.network_tx);
-                    networkRecv.push(stats.network_rx);
-
-                    // List Item Generation
-                    const isSel = selectedContainer === cId;
-                    listHtml += `
-                        <div class="p-3 rounded-xl border cursor-pointer flex justify-between items-center transition mb-2
-                        ${isSel ? 'bg-white/10 border-orange-500/40 shadow-lg' : 'bg-white/5 border-transparent hover:bg-white/10'}"
-                        onclick="selectContainer('${cId}')">
-                            <div class="text-sm font-bold text-white truncate w-32">${cId}</div>
-                            <div class="text-xs text-white/60">${Math.round((stats.cpu_usage||0)/1000)}k</div>
-                        </div>
-                    `;
-
-                    // Update Main Charts if this is the selected container
-                    if (isSel) {
-                        updateChartData(stats);
-                    }
+                    // 3. Update Charts
+                    const charts = containerCharts[cId];
                     
-                    containerLabels.push(cId);
+                    // Mem
+                    if (charts.mem.data.labels.length > 30) {
+                        charts.mem.data.labels.shift();
+                        charts.mem.data.datasets[0].data.shift();
+                    }
+                    charts.mem.data.labels.push(time);
+                    charts.mem.data.datasets[0].data.push(Math.round((stats.memory_bytes||0) / 1024 / 1024));
+                    charts.mem.update('none');
+
+                    // Net
+                    if (charts.net.data.labels.length > 30) {
+                        charts.net.data.labels.shift();
+                        charts.net.data.datasets[0].data.shift();
+                        charts.net.data.datasets[1].data.shift();
+                    }
+                    charts.net.data.labels.push(time);
+                    charts.net.data.datasets[0].data.push(netTx);
+                    charts.net.data.datasets[1].data.push(netRx);
+                    charts.net.update('none');
+
                 });
             });
 
-            listEl.innerHTML = listHtml;
-
-            // Global Metrics
-            document.getElementById('metric-nodes').innerText = Object.keys(nodes).length;
-            document.getElementById('metric-containers').innerText = containerCount;
-            document.getElementById('metric-cpu').innerText = Math.round(totalCpu/1000000) + 'M';
-            document.getElementById('metric-security').innerText = '98'; 
-
-            // Update Memory Chart (Aggregate)
-            if (memoryChart.data.labels.length > 40) {
-                memoryChart.data.labels.shift();
-                memoryChart.data.datasets[0].data.shift();
-            }
-            memoryChart.data.labels.push(time);
-            memoryChart.data.datasets[0].data.push(Math.round(totalMem / (1024 * 1024))); // Convert to MB
-            memoryChart.update('none');
-
-            // Update Accuracy Gauge (Focus on Selected or Aggregate)
-            if (containerCount > 0) {
-                let accuracy = 95;
-                // If ML Project is selected, use its logic
-                if (selectedContainer === 'os-ml-project') {
-                     // Check if we have stats for it
-                     let found = false;
-                     Object.values(nodes).forEach(n => {
-                         if (n.containers['os-ml-project']) {
-                             const s = n.containers['os-ml-project'];
-                             if ((s.cpu_usage||0) > 1000000) accuracy = 88; 
-                             if ((s.cpu_usage||0) < 500000 && (s.memory_bytes||0) > 1000000) accuracy = 99;
-                             found = true;
-                         }
-                     });
-                     if (!found) accuracy = 0; // container gone
-                } else {
-                    accuracy = totalPred > 0 ? Math.min(100, Math.round((totalCpu / totalPred) * 100)) : 95;
+            // 4. Cleanup Removed Containers
+            Object.keys(containerCharts).forEach(id => {
+                if (!currentIds.has(id)) {
+                    const card = document.getElementById(`card-${id}`);
+                    if(card) card.remove();
+                    
+                    containerCharts[id].mem.destroy();
+                    containerCharts[id].net.destroy();
+                    delete containerCharts[id];
                 }
-                
-                accuracyGauge.data.datasets[0].data = [accuracy, 100 - accuracy];
-                accuracyGauge.update('none');
-                document.getElementById('accuracy-value').innerText = accuracy + '%';
-            }
-
-            // Update Health Timeline
-            healthTimeline.data.labels = containerLabels.slice(0, 5);
-            healthTimeline.data.datasets[0].data = uptimes.slice(0, 5);
-            healthTimeline.update('none');
-
-            // Update Network Chart
-            networkChart.data.labels = containerLabels.slice(0, 5);
-            networkChart.data.datasets[0].data = networkSent.slice(0, 5);
-            networkChart.data.datasets[1].data = networkRecv.slice(0, 5);
-            networkChart.update('none');
+            });
         }
 
         function updateLogs(logs) {
