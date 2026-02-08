@@ -612,22 +612,55 @@
             let networkSent = [];
             let networkRecv = [];
 
+            // Check if os-ml-project exists in any node
+            let mlNode = null;
+            let mlStats = null;
+            
             Object.entries(nodes).forEach(([nodeId, data]) => {
-                Object.entries(data.containers).forEach(([cId, stats]) => {
-                    containerCount++;
-                    totalCpu += stats.cpu_usage || 0;
-                    totalPred += stats.prediction || 0;
-                    totalMem += stats.memory_bytes || 0;
-                    
-                    // Health Timeline data
-                    containerLabels.push(cId);
-                    uptimes.push(Math.floor(Math.random() * 3600)); // Simulated uptime
-                    
-                    // Network I/O data (simulated)
-                    networkSent.push(Math.floor(Math.random() * 1000));
-                    networkRecv.push(Math.floor(Math.random() * 1500));
-                });
+                if (data.containers['os-ml-project']) {
+                    mlStats = data.containers['os-ml-project'];
+                    mlNode = nodeId;
+                }
             });
+
+            if (mlStats) {
+                // Focus ONLY on ML Project
+                containerCount = 1;
+                totalCpu = mlStats.cpu_usage || 0;
+                totalPred = mlStats.prediction || 0;
+                totalMem = mlStats.memory_bytes || 0;
+                
+                containerLabels.push('os-ml-project');
+                uptimes.push(120); // Demo specific
+                
+                // Network (Simulated for Demo based on phase)
+                // If mem is rising (loading), high Network I/O
+                if (totalMem > 500 * 1024 * 1024 && totalMem < 1.8 * 1024 * 1024 * 1024) {
+                    networkRecv.push(85000); // 85MB/s
+                } else {
+                    networkRecv.push(1200);
+                }
+                networkSent.push(500);
+
+            } else {
+                // Default Aggregation
+                Object.entries(nodes).forEach(([nodeId, data]) => {
+                    Object.entries(data.containers).forEach(([cId, stats]) => {
+                        containerCount++;
+                        totalCpu += stats.cpu_usage || 0;
+                        totalPred += stats.prediction || 0;
+                        totalMem += stats.memory_bytes || 0;
+                        
+                        // Health Timeline data
+                        containerLabels.push(cId);
+                        uptimes.push(Math.floor(Math.random() * 3600)); // Simulated uptime
+                        
+                        // Network I/O data (simulated)
+                        networkSent.push(Math.floor(Math.random() * 1000));
+                        networkRecv.push(Math.floor(Math.random() * 1500));
+                    });
+                });
+            }
 
             // Update Memory Chart
             if (memoryChart.data.labels.length > 40) {
@@ -640,7 +673,16 @@
 
             // Update Accuracy Gauge
             if (containerCount > 0) {
-                const accuracy = totalPred > 0 ? Math.min(100, Math.round((totalCpu / totalPred) * 100)) : 95;
+                // If ML Project, use its prediction accuracy (simulated based on CPU stability?)
+                // For demo: if training (High CPU), accuracy is rising.
+                let accuracy = 95;
+                if (mlStats) {
+                    if (totalCpu > 1000000) accuracy = 88; // training hard
+                    if (totalCpu < 500000 && totalMem > 1000000) accuracy = 99; // finished/validated
+                } else {
+                    accuracy = totalPred > 0 ? Math.min(100, Math.round((totalCpu / totalPred) * 100)) : 95;
+                }
+                
                 accuracyGauge.data.datasets[0].data = [accuracy, 100 - accuracy];
                 accuracyGauge.update('none');
                 document.getElementById('accuracy-value').innerText = accuracy + '%';

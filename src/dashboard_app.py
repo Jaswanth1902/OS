@@ -146,77 +146,76 @@ class SimulationEngine:
 
     def _run_loop(self):
         node_id = "sim-node-01"
-        container_id = "ML-Project-Container"
+        bg_containers = ["web-server", "db-service", "auth-worker"]
+        ml_container_id = "os-ml-project"
         
         start_time = time.time()
         
         while self.active:
-            # Lifecycle Management (2 Minute Cycle)
-            elapsed = time.time() - start_time
-            if elapsed > 130: 
-                start_time = time.time() # Loop the demo
-                elapsed = 0
-                log_event("GovernanceEngine", f"Restarting Demo Cycle for {container_id}", "INFO")
-
-            # Initialize node if not present
+            # 1. Background Noise (Simulated Containers)
             if node_id not in GLOBAL_STATE["nodes"]:
                 GLOBAL_STATE["nodes"][node_id] = {"containers": {}, "last_seen": 0}
 
             current_time = asyncio.get_event_loop().time() if asyncio.get_event_loop().is_running() else time.time()
             GLOBAL_STATE["nodes"][node_id]["last_seen"] = current_time
 
-            # Default Low Resources
-            cpu_usage = 50000  # 5%
-            mem_usage = 128 * 1024 * 1024 # 128MB
-            
-            # 1. Initialization (0-10s)
-            if elapsed < 10:
-                cpu_usage = 100000 + random.randint(-10000, 10000)
-                if int(elapsed) % 5 == 0:
-                    log_event("Orchestrator", f"Allocating initial resources for {container_id}", "INFO")
-            
-            # 2. Data Loading (10-40s)
-            elif elapsed < 40:
-                # Memory Ramps Up
-                progress = (elapsed - 10) / 30
-                mem_usage = 128 * 1024 * 1024 + (progress * 2 * 1024 * 1024 * 1024) # Up to 2GB
-                cpu_usage = 300000 + random.randint(-50000, 50000)
-                if int(elapsed) == 20:
-                     log_event("ML-Engine", "Loading dataset into memory (1.5GB)...", "INFO")
-            
-            # 3. Training (40-100s) - High CPU
-            elif elapsed < 100:
-                cpu_usage = 2500000 + random.randint(-200000, 200000) # 2.5 Cores
-                mem_usage = 2.2 * 1024 * 1024 * 1024 # Steady High Mem
+            for c_id in bg_containers:
+                # Standard random load for background services
+                base_cpu = 100000 + random.randint(-10000, 20000)
+                if self.mode == "spike" and c_id == "web-server": base_cpu += 700000
+                if self.mode == "attack": base_cpu += 1400000
+
+                GLOBAL_STATE["nodes"][node_id]["containers"][c_id] = {
+                    "node_id": node_id,
+                    "id": c_id,
+                    "cpu_usage": int(base_cpu),
+                    "memory_bytes": 256 * 1024 * 1024,
+                    "prediction": int(base_cpu * 1.1)
+                }
                 
-                if int(elapsed) == 45:
-                    log_event("GovernanceEngine", f"Detected high load in {container_id}. Increasing CPU limits dynamically.", "WARNING")
-                if int(elapsed) == 70:
-                    log_event("AutoScaler", f"Scaling out calculation nodes for {container_id}", "SUCCESS")
+                # Security Score for bg apps
+                score = 95 if self.mode != "attack" else (45 if c_id == "web-server" and random.random() < 0.1 else 95)
+                GLOBAL_STATE["security_scores"][c_id] = {"score": score, "risks": ["Potential Threat"] if score < 50 else []}
+                if score < 50: log_event("SecurityScanner", f"Threat Detected in {c_id}", "CRITICAL")
 
-            # 4. Completion (100-120s)
-            elif elapsed < 120:
-                cpu_usage = 200000 # Drop
-                mem_usage = 512 * 1024 * 1024 
-                if int(elapsed) == 101:
-                    log_event("ML-Engine", "Training complete. Model saved.", "SUCCESS")
-                if int(elapsed) == 105:
-                    log_event("GovernanceEngine", "Releasing unused resources back to pool.", "INFO")
-
-            # Prediction is slightly ahead of actual
-            pred_cpu = cpu_usage * 1.05
-
-            stats = {
-                "node_id": node_id,
-                "id": container_id,
-                "cpu_usage": int(cpu_usage),
-                "memory_bytes": int(mem_usage),
-                "prediction": int(pred_cpu)
-            }
-            GLOBAL_STATE["nodes"][node_id]["containers"][container_id] = stats
+            # 2. Check for Real Activity (os-ml-project)
+            ml_active = False
+            for nid in GLOBAL_STATE["nodes"]:
+                if ml_container_id in GLOBAL_STATE["nodes"][nid]["containers"]:
+                    ml_active = True
+                    break
             
-            # Security Score (Healthy for this demo unless explicitly attacked)
-            GLOBAL_STATE["security_scores"][container_id] = {"score": 98, "risks": []}
+            # If the Real Docker Container is running, synchronize our story logs with it
+            if ml_active:
+                elapsed = time.time() - start_time
+                if elapsed > 130: 
+                    start_time = time.time() # Loop the demo cycle logs
+                    elapsed = 0
+                    log_event("GovernanceEngine", f"Restarting Demo Logic for {ml_container_id}", "INFO")
+
+                # 0-10s: Init
+                if elapsed < 10:
+                    if int(elapsed) % 5 == 0:
+                        log_event("Orchestrator", f"Allocating initial resources for {ml_container_id}", "INFO")
+                # 10-40s: Data Loading
+                elif elapsed < 40:
+                    if int(elapsed) == 20:
+                         log_event("ML-Engine", "Loading dataset into memory (1.5GB)...", "INFO")
+                # 40-100s: Training
+                elif elapsed < 100:
+                    if int(elapsed) == 45:
+                        log_event("GovernanceEngine", f"Detected high load in {ml_container_id}. Increasing CPU limits dynamically.", "WARNING")
+                    if int(elapsed) == 70:
+                        log_event("AutoScaler", f"Scaling out calculation nodes for {ml_container_id}", "SUCCESS")
+                # 100-120s: Completion
+                elif elapsed < 120:
+                    if int(elapsed) == 101:
+                        log_event("ML-Engine", "Training complete. Model saved.", "SUCCESS")
+                    if int(elapsed) == 105:
+                        log_event("GovernanceEngine", "Releasing unused resources back to pool.", "INFO")
+            else:
+                # Reset log timer if container disappears
+                start_time = time.time()
 
             time.sleep(1)
 

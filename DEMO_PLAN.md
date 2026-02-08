@@ -1,45 +1,54 @@
-# Showcase Demo Plan: "The ML Stress Test"
+# OS Container Management - Showcase Demo Plan
 
-## 1. The Narrative
-We will demonstrate that the **OS Intelligence Agent** is "Universal". It doesn't need custom integrations; it automatically detects, monitors, and governs *any* Linux workload you throw at it—even a heavy Machine Learning training job.
+## goal
+Demonstrate a "Zero-Touch" Intelligent Operating System that manages container resources autonomously.
 
-## 2. Setup (Pre-Show)
-1.  **Start the Brain (Dashboard)**
+## Prerequisities
+1.  **Windows with Docker Desktop** running.
+2.  Python 3.9+ installed.
+3.  Git Bash or PowerShell terminal.
+4.  Port `8000` is free.
+
+## Phase 1: Setup (Before Audience Arrives)
+1.  Open Terminal in `c:\Users\jaswa\Downloads\OS`.
+2.  Start the Dashboard:
     ```bash
-    uvicorn src.dashboard_app:app --host 0.0.0.0 --port 8000
+    uvicorn src.dashboard_app:app --port 8000
     ```
-2.  **Stop Simulation**: Ensure the "Showcase Mode" is **OFF** in the dashboard so the view is empty/clean.
-3.  **Start the Eyes (Agent)**
-    Ensure your agent is running and watching Docker.
-    ```bash
-    # In a separate terminal
-    python src/agent.py --node-id "PROD-SERVER-01"
+3.  Open Browser to `http://localhost:8000`.
+
+## Phase 2: The Pitch (Simulation Lab)
+"We have built an OS that watches containers like a hawk."
+
+1.  Navigate to **Simulation Lab**.
+2.  Explain: "first, let's start the background services."
+3.  Click **"Start Simulation"**.
+    *   3 simulated containers (`web-server`, `db-service`, `auth-worker`) appear.
+    *   Show **Statistics** view: It shows aggregate data for these services.
+
+## Phase 3: The Real Stuff (Manual Launch)
+"Now, let's run a **Real Machine Learning Project** on this local machine."
+
+1.  Open a new Terminal.
+2.  Run the workload script:
+    ```cmd
+    run_ml_workload.bat
     ```
+    *   *Explain:* "This builds a Docker container and launches our Agent."
+    *   A new window will pop up (The Agent).
 
-## 3. The "Surprise" Workload
-*You (The Presenter) will run a never-before-seen container live.*
+3.  **Switch to Dashboard**:
+    *   **Auto-Detection**: The Dashboard *immediately* updates.
+    *   **Statistics View**: Now focuses EXCLUSIVELY on `os-ml-project`.
+    *   **Graphs**: Watch the Real CPU/Memory spikes.
 
-### A. The Setup (Your Custom ML Job)
-You mentioned you will package a Python script that:
-1.  **Cleans Data**: Loops through a large Dataset (High CPU).
-2.  **Trains Model**: Fits a Model (High CPU + High Memory).
-3.  **Completes**: Exits or sleeps.
+## Phase 4: The Story (2-Minute Lifecycle)
+1.  **0-10s (Initialization)**: Low usage.
+2.  **10-40s (Data Loading)**: Memory graph rises (Loading 1.5GB).
+3.  **40-100s (Training)**: CPU spikes to 100%. 
+    *   **Intelligence View**: Logs appear: *"Detected high load... Increasing limits"*.
+4.  **100s+ (Completion)**: Usage drops.
 
-### B. The Execution
-Run your custom container:
-```bash
-docker run --rm --name live-ml-training <your-image-name>
-```
-
-## 4. What to Show on Dashboard (The "Wow" Moment)
-1.  **Auto-Discovery**: Point at the **"Active Containers"** list.
-    *   *Script*: "Notice I didn't configure anything. The system instantly detected `live-ml-training`."
-2.  **Real-Time Telemetry**:
-    *   **Data Cleaning Phase**: "Look at the CPU graph climbing as we scrub the data."
-    *   **Training Phase**: "Now watch the Memory usage spike. The model is loading the dataset into RAM."
-3.  **Intelligence Logs**:
-    *   If the usage gets very high, check the **Intelligence/Logs** section.
-    *   *Script*: "The AI sees this spike. It's logging the resource consumption in real-time."
-
-## 5. Conclusion
-"This proves our system provides **Zero-Touch Observability** for any application, from simple web servers to complex AI pipelines."
+## Phase 5: Cleanup
+1.  Run `stop_ml_workload.bat` to kill the container.
+2.  Click **"Stop"** in Simulation Lab.
